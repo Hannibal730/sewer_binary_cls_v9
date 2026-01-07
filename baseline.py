@@ -599,14 +599,14 @@ def inference(run_cfg, model_cfg, model, data_loader, device, run_dir_path, time
     single_dummy_input = dummy_input[0].unsqueeze(0) if dummy_input.shape[0] > 1 else dummy_input
 
     # --- 양자화(Quantization) 적용 ---
-    use_fp16 = getattr(run_cfg, 'use_fp16', False)
-    use_int8 = getattr(run_cfg, 'use_int8', False)
+    use_fp16 = getattr(run_cfg, 'use_fp16_inference', False)
+    use_int8 = getattr(run_cfg, 'use_int8_inference', False)
+
+    if use_int8 and use_fp16:
+        logging.error("use_int8_inference과 use_fp16_inference이 동시에 설정되었습니다. 둘 중 하나만 True로 설정해주세요.")
+        raise ValueError("Conflicting quantization options: use_int8_inference and use_fp16_inference are both True.")
 
     if use_int8:
-        if use_fp16:
-            logging.warning("use_int8과 use_fp16이 동시에 설정되었습니다. INT8을 우선 적용하며, FP16은 무시됩니다.")
-            use_fp16 = False
-        
         logging.info("INT8 Dynamic Quantization(동적 양자화)을 적용합니다... (CPU 전용)")
         if device.type != 'cpu':
             logging.warning("INT8 양자화는 PyTorch에서 CPU 추론에 최적화되어 있습니다. 디바이스를 CPU로 변경합니다.")

@@ -239,6 +239,8 @@ def evaluate(run_cfg, model, data_loader, device, criterion, loss_function_name,
     with torch.no_grad():
         for images, labels, _ in progress_bar: # 파일명은 사용하지 않으므로 _로 받음
             images, labels = images.to(device), labels.to(device)
+            if getattr(run_cfg, 'use_fp16_active', False):
+                images = images.half()
 
             outputs = model(images) # [B, num_labels]
 
@@ -499,6 +501,34 @@ def inference(run_cfg, model_cfg, model, data_loader, device, run_dir_path, time
     dummy_input = measure_model_flops(model, device, data_loader)
     single_dummy_input = dummy_input[0].unsqueeze(0) if dummy_input.shape[0] > 1 else dummy_input
 
+    # --- 양자화(Quantization) 적용 ---
+    use_fp16 = getattr(run_cfg, 'use_fp16_inference', False)
+    use_int8 = getattr(run_cfg, 'use_int8_inference', False)
+
+    if use_int8 and use_fp16:
+        logging.error("use_int8_inference과 use_fp16_inference이 동시에 설정되었습니다. 둘 중 하나만 True로 설정해주세요.")
+        raise ValueError("Conflicting quantization options: use_int8_inference and use_fp16_inference are both True.")
+
+    if use_int8:
+        logging.info("INT8 Dynamic Quantization(동적 양자화)을 적용합니다... (CPU 전용)")
+        if device.type != 'cpu':
+            logging.warning("INT8 양자화는 PyTorch에서 CPU 추론에 최적화되어 있습니다. 디바이스를 CPU로 변경합니다.")
+            device = torch.device('cpu')
+            model = model.to(device)
+            single_dummy_input = single_dummy_input.to(device)
+        
+        # PyTorch의 동적 양자화 적용 (Linear 레이어 대상)
+        model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
+    
+    elif use_fp16:
+        if device.type == 'cuda':
+            logging.info("FP16(Half Precision)을 적용합니다... (CUDA)")
+            model.half()
+            single_dummy_input = single_dummy_input.half()
+        else:
+            logging.warning("FP16은 CUDA 디바이스에서만 지원됩니다. CPU에서는 무시됩니다.")
+            use_fp16 = False
+
     # --- 샘플 당 Forward Pass 시간 및 메모리 사용량 측정 ---
     avg_inference_time_per_sample = 0.0
     logging.info("GPU 캐시를 비우고, 단일 샘플에 대한 Forward Pass 시간 및 최대 GPU 메모리 사용량 측정을 시작합니다...")
@@ -602,6 +632,8 @@ def inference(run_cfg, model_cfg, model, data_loader, device, run_dir_path, time
         with torch.no_grad():
             for images, _, filenames in progress_bar:
                 images = images.to(device)
+                if use_fp16:
+                    images = images.half()
                 outputs = model(images)
                 
                 # Softmax를 적용하여 확률 계산
@@ -633,7 +665,9 @@ def inference(run_cfg, model_cfg, model, data_loader, device, run_dir_path, time
     else:
         # 평가 모드: 기존 evaluate 함수 호출
         # 어텐션 맵을 저장하기 위해 evaluate 함수를 직접 호출하는 대신, 루프를 여기서 실행합니다.
+        run_cfg.use_fp16_active = use_fp16
         eval_results = evaluate(run_cfg, model, data_loader, device, nn.CrossEntropyLoss(), 'crossentropyloss', desc=f"[{mode_name}]", class_names=class_names, log_class_metrics=True)
+        del run_cfg.use_fp16_active
         final_acc = eval_results['accuracy']
 
         # 3. 혼동 행렬 생성 및 저장 (최종 평가 시에만)
@@ -660,6 +694,8 @@ def inference(run_cfg, model_cfg, model, data_loader, device, run_dir_path, time
                     break
 
                 sample_images = sample_images.to(device)
+                if use_fp16:
+                    sample_images = sample_images.half()
                 batch_size = sample_images.size(0)
 
                 # 모델을 실행하여 어텐션 맵이 저장되도록 함

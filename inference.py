@@ -81,6 +81,8 @@ def get_default_config():
             'show_log': True,
             'cuda': True,
             'num_workers': 4,
+            'use_fp16_inference': False,
+            'use_int8_inference': False,
             'dataset': {
                 'name': 'Inference_Run',
             }
@@ -409,6 +411,32 @@ def main():
 
     model.eval()
 
+    # --- 양자화(Quantization) 적용 ---
+    use_fp16 = getattr(run_cfg, 'use_fp16_inference', False)
+    use_int8 = getattr(run_cfg, 'use_int8_inference', False)
+
+    if use_int8 and use_fp16:
+        logging.error("use_int8_inference과 use_fp16_inference이 동시에 설정되었습니다. 둘 중 하나만 True로 설정해주세요.")
+        raise ValueError("Conflicting quantization options: use_int8_inference and use_fp16_inference are both True.")
+
+    if use_int8:
+        logging.info("INT8 Dynamic Quantization(동적 양자화)을 적용합니다... (CPU 전용)")
+        if device.type != 'cpu':
+            logging.warning("INT8 양자화는 PyTorch에서 CPU 추론에 최적화되어 있습니다. 디바이스를 CPU로 변경합니다.")
+            device = torch.device('cpu')
+            model = model.to(device)
+        
+        # PyTorch의 동적 양자화 적용 (Linear 레이어 대상)
+        model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
+    
+    elif use_fp16:
+        if device.type == 'cuda':
+            logging.info("FP16(Half Precision)을 적용합니다... (CUDA)")
+            model.half()
+        else:
+            logging.warning("FP16은 CUDA 디바이스에서만 지원됩니다. CPU에서는 무시됩니다.")
+            use_fp16 = False
+
     # 7. 추론 실행
     all_filenames = []
     all_predictions = []
@@ -420,6 +448,8 @@ def main():
     with torch.no_grad():
         for images, _, filenames in progress_bar:
             images = images.to(device)
+            if use_fp16:
+                images = images.half()
             outputs = model(images)
             
             # Softmax로 확률 계산
