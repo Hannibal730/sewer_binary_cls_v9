@@ -785,17 +785,30 @@ def run_torch_pruning(model, baseline_cfg, model_cfg, device, train_loader=None,
         def _hook(self, module, input, output):
             # 입력 텐서의 채널별 L2 Norm을 계산하여 저장합니다.
             x = input[0]
+            # 데이터 배치에 대한 각 뉴런의 활성화 값의 제곱합을 누적하여 전체 데이터셋의 통계를 반영합니다.
+            # [동작 원리]
+            # 전체 데이터셋에 대한 L2 Norm을 구해야 하지만, 메모리 문제로 배치를 나누어 처리합니다.
+            # L2 Norm 공식은 sqrt(sum(x^2))이므로, 각 배치에서 x^2의 합(squared sum)을 계산하여 계속 더해줍니다(Accumulate).
+            # 마지막에 __call__ 함수에서 sqrt를 취하면, 전체 데이터를 한 번에 계산한 것과 수학적으로 동일한 결과를 얻습니다.
             if isinstance(module, nn.Linear):
                 # x: [Batch, In] or [Batch, Tokens, In]
                 if x.dim() == 2:
-                    norm = x.norm(p=2, dim=0)
+                    sq_sum = x.pow(2).sum(dim=0)
                 else:
-                    norm = x.flatten(0, 1).norm(p=2, dim=0)
-                self.input_norms[module] = norm
+                    sq_sum = x.flatten(0, 1).pow(2).sum(dim=0)
+                
+                if module in self.input_norms:
+                    self.input_norms[module] += sq_sum
+                else:
+                    self.input_norms[module] = sq_sum
             elif isinstance(module, nn.Conv2d):
-                # x: [Batch, In, H, W] -> [Batch*H*W, In] -> Norm over dim 0
-                norm = x.transpose(0, 1).flatten(1).norm(p=2, dim=1)
-                self.input_norms[module] = norm
+                # x: [Batch, In, H, W] -> 제곱합 계산
+                sq_sum = x.pow(2).sum(dim=(0, 2, 3))
+                
+                if module in self.input_norms:
+                    self.input_norms[module] += sq_sum
+                else:
+                    self.input_norms[module] = sq_sum
 
         def __call__(self, group, ch_groups=1):
             group_imp = []
@@ -804,7 +817,10 @@ def run_torch_pruning(model, baseline_cfg, model_cfg, device, train_loader=None,
                 pruning_fn = dep.handler
                 if module not in self.input_norms: continue
                 
-                inp_norm = self.input_norms[module] # [In]
+                # 누적된 제곱합에 sqrt를 취해 최종 L2 Norm 계산
+                # 위 _hook 함수에서 누적한 제곱합(Sum of Squares)에 루트를 씌워
+                # 전체 Calibration 데이터셋에 대한 정확한 Global L2 Norm을 구합니다.
+                inp_norm = self.input_norms[module].sqrt() # [In]
                 layer_weight = module.weight # [Out, In, ...]
 
                 # Pruning Output Channels (dim 0) 인 경우에만 Wanda Score 계산
@@ -873,15 +889,23 @@ def run_torch_pruning(model, baseline_cfg, model_cfg, device, train_loader=None,
             logging.error("Wanda Pruning을 사용하려면 Calibration을 위한 train_loader가 필요합니다.")
             return model
         imp = WandaImportance()
-        logging.info("Wanda 중요도 계산을 위해 Calibration(1 배치)을 수행합니다...")
+        logging.info("Wanda 중요도 계산을 위해 Calibration을 수행합니다...")
         model.eval()
         hooks = []
         for m in model.modules():
             if isinstance(m, (nn.Linear, nn.Conv2d)):
                 hooks.append(m.register_forward_hook(imp._hook))
+        
+        # Calibration을 위해 여러 배치를 사용하여 샘플 수를 확보 (예: 128개 샘플 목표)
+        num_wanda_calib_samples = getattr(baseline_cfg, 'num_wanda_calib_samples', 128)
+        num_batches = (num_wanda_calib_samples + train_loader.batch_size - 1) // train_loader.batch_size
+        logging.info(f"  - Calibration Samples: {num_wanda_calib_samples} (approx {num_batches} batches)")
+        
         with torch.no_grad():
-            images, _, _ = next(iter(train_loader))
-            model(images.to(device))
+            for i, (images, _, _) in enumerate(train_loader):
+                if i >= num_batches: break
+                model(images.to(device))
+                
         for h in hooks: h.remove()
         pruner_class = tp.pruner.MagnitudePruner
         pruner_kwargs = {'importance': imp, 'pruning_ratio': pruning_sparsity}
