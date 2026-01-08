@@ -97,6 +97,26 @@ python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/o
   ```bash
   python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_FLOPs/mobile_vit_xxs_fpgm/best_model.pth" --baseline_name "mobile_vit_xxs" --pruning_info "./pretrained/baselines/pruned/iso_FLOPs/mobile_vit_xxs_fpgm/pruning_info.yaml"
   ```
+
+* ##### Wanda Pruning
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_FLOPs/resnet18_wanda/best_model.pth" --baseline_name "resnet18" --pruning_info "./pretrained/baselines/pruned/iso_FLOPs/resnet18_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_FLOPs/efficientnet_b0_wanda/best_model.pth" --baseline_name "efficientnet_b0" --pruning_info "./pretrained/baselines/pruned/iso_FLOPs/efficientnet_b0_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_FLOPs/mobilenet_v4_s_wanda/best_model.pth" --baseline_name "mobilenet_v4_s" --pruning_info "./pretrained/baselines/pruned/iso_FLOPs/mobilenet_v4_s_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_FLOPs/xie2019_wanda/best_model.pth" --baseline_name "xie2019" --pruning_info "./pretrained/baselines/pruned/iso_FLOPs/xie2019_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_FLOPs/deit_tiny_wanda/best_model.pth" --baseline_name "deit_tiny" --pruning_info "./pretrained/baselines/pruned/iso_FLOPs/deit_tiny_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_FLOPs/mobile_vit_xxs_wanda/best_model.pth" --baseline_name "mobile_vit_xxs" --pruning_info "./pretrained/baselines/pruned/iso_FLOPs/mobile_vit_xxs_wanda/pruning_info.yaml"
+  ```
 ---
 
 #### 4.4. Iso-Params Pruned 베이스라인
@@ -139,6 +159,26 @@ python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/o
   ```
   ```bash
   python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_params/mobile_vit_xxs_fpgm/best_model.pth" --baseline_name "mobile_vit_xxs" --pruning_info "./pretrained/baselines/pruned/iso_params/mobile_vit_xxs_fpgm/pruning_info.yaml"
+  ```
+
+* ##### Wanda Pruning
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_params/efficientnet_b0_wanda/best_model.pth" --baseline_name "efficientnet_b0" --pruning_info "./pretrained/baselines/pruned/iso_params/efficientnet_b0_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_params/resnet18_wanda/best_model.pth" --baseline_name "resnet18" --pruning_info "./pretrained/baselines/pruned/iso_params/resnet18_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_params/mobilenet_v4_s_wanda/best_model.pth" --baseline_name "mobilenet_v4_s" --pruning_info "./pretrained/baselines/pruned/iso_params/mobilenet_v4_s_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_params/xie2019_wanda/best_model.pth" --baseline_name "xie2019" --pruning_info "./pretrained/baselines/pruned/iso_params/xie2019_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_params/deit_tiny_wanda/best_model.pth" --baseline_name "deit_tiny" --pruning_info "./pretrained/baselines/pruned/iso_params/deit_tiny_wanda/pruning_info.yaml"
+  ```
+  ```bash
+  python inference.py --img_dir "./data/samples" --model "./pretrained/baselines/pruned/iso_params/mobile_vit_xxs_wanda/best_model.pth" --baseline_name "mobile_vit_xxs" --pruning_info "./pretrained/baselines/pruned/iso_params/mobile_vit_xxs_wanda/pruning_info.yaml"
   ```
 
 ---
