@@ -1,0 +1,725 @@
+2026-03-09 08:13:55,599 - INFO - 로그 파일이 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/log_20260309_081355.log'에 저장됩니다.
+2026-03-09 08:13:55,601 - INFO - ==================================================
+2026-03-09 08:13:55,601 - INFO - config.yaml:
+2026-03-09 08:13:55,601 - INFO - 
+run:
+  global_seed: 42
+  cuda: true
+  mode: train
+  pth_best_name: best_model.pth
+  only_inference: false
+  show_log: true
+  dataset:
+    name: Sewer_ML_flops
+    type: csv
+    train_split_ratio: 0.8
+    paths:
+      train_img_dir: /home/tai/workspace/ssd1/data/Sewer/Sewer-ML/train
+      valid_img_dir: /home/tai/workspace/ssd1/data/Sewer/Sewer-ML/valid
+      test_img_dir: /home/tai/workspace/ssd1/data/Sewer/Sewer-ML/valid
+      train_csv: /home/tai/workspace/ssd1/data/Sewer/Sewer-ML/SewerML_Train.csv
+      valid_csv: /home/tai/workspace/ssd1/data/Sewer/Sewer-ML/SewerML_Val.csv
+      test_csv: /home/tai/workspace/ssd1/data/Sewer/Sewer-ML/SewerML_Val.csv
+      img_folder: /home/tai/workspace/ssd1/data/Sewer/Sewer-TAPNEW
+  random_sampling_ratio:
+    train: 1.0
+    valid: 1.0
+    test: 1.0
+  num_workers: 16
+model:
+  img_size: 224
+  num_patches_per_side: 7
+  num_decoder_patches: 1
+  num_decoder_layers: 6
+  num_heads: 4
+  cnn_feature_extractor:
+    name: custom32
+  encoder_dim: 32
+  emb_dim: 32
+  adaptive_initial_query: true
+  decoder_ff_ratio: 2
+  dropout: 0.1
+  positional_encoding: true
+  drop_path_ratio: 0.2
+  visualize_attention: true
+  num_plot_attention: 1500
+training_main:
+  epochs: 10
+  batch_size: 256
+  pre_trained: false
+  optimizer: adamw
+  lr: 0.001
+  weight_decay: 0.0001
+  loss_function: CrossEntropyLoss
+  label_smoothing: 0.1
+  scheduler: cosineannealinglr
+  scheduler_params:
+    T_max: 10
+    eta_min: 0.0001
+  best_model_criterion: val_loss
+training_baseline:
+  model_name: mobilenet_v4_s
+  epochs: 10
+  batch_size: 256
+  pre_trained: false
+  optimizer: adamw
+  lr: 0.001
+  weight_decay: 0.0001
+  loss_function: CrossEntropyLoss
+  label_smoothing: 0.1
+  scheduler: cosineannealinglr
+  scheduler_params:
+    T_max: 10
+    eta_min: 0.0001
+  best_model_criterion: val_loss
+finetuning_pruned:
+  epochs: 80
+  batch_size: 256
+  optimizer: adamw
+  lr: 0.001
+  weight_decay: 0.0001
+  loss_function: CrossEntropyLoss
+  label_smoothing: 0.1
+  scheduler: cosineannealinglr
+  scheduler_params:
+    T_max: 80
+    eta_min: 0.0001
+  best_model_criterion: val_loss
+  use_wanda_pruning: true
+  num_wanda_calib_samples: 4096
+  pruning_sparsity: 0.2451
+  exclude_attention_qkv_pruning: true
+  exclude_embedding_bridge_pruning: true
+  exclude_learnable_queries_pruning: true
+
+2026-03-09 08:13:55,601 - INFO - ==================================================
+2026-03-09 08:13:55,730 - INFO - CUDA 사용 가능. GPU 사용을 시작합니다. (Device: NVIDIA GeForce RTX 5090)
+2026-03-09 08:13:55,730 - INFO - 'Sewer_ML_flops' 데이터 로드를 시작합니다 (Type: csv).
+2026-03-09 08:13:56,287 - INFO - 데이터셋 클래스: ['Normal', 'Defect'] (총 2개)
+2026-03-09 08:13:56,288 - INFO - 훈련 데이터: 1040129개, 검증 데이터: 130046개, 테스트 데이터: 130046개
+2026-03-09 08:13:56,288 - INFO - Baseline 모델 'mobilenet_v4_s'을(를) 생성합니다 (사전 훈련 가중치: 미사용).
+2026-03-09 08:13:56,375 - INFO - ==================================================
+2026-03-09 08:13:56,375 - INFO - 모델 파라미터 수:
+2026-03-09 08:13:56,375 - INFO -   - 총 파라미터: 2,495,586 개
+2026-03-09 08:13:56,375 - INFO -   - 학습 가능한 파라미터: 2,495,586 개
+2026-03-09 08:13:56,375 - INFO - ================================================================================
+2026-03-09 08:13:56,375 - INFO - 단계 1/2: 사전 훈련(Pre-training)을 시작합니다.
+2026-03-09 08:13:56,375 - INFO - ================================================================================
+2026-03-09 08:13:56,375 - INFO - 옵티마이저: AdamW (lr=0.001, weight_decay=0.0001)
+2026-03-09 08:13:56,375 - INFO - 스케줄러: CosineAnnealingLR (T_max=10, eta_min=0.0001)
+2026-03-09 08:13:56,376 - INFO - ==================================================
+2026-03-09 08:13:56,376 - INFO - train 모드를 시작합니다.
+2026-03-09 08:13:56,376 - INFO - 손실 함수: CrossEntropyLoss (label_smoothing: 0.1)
+2026-03-09 08:13:56,376 - INFO - Best metric을 초기값(inf)으로 설정합니다.
+2026-03-09 08:13:56,376 - INFO - --------------------------------------------------
+2026-03-09 08:13:56,376 - INFO - [LR]    [1/10] | Learning Rate: 0.001000
+2026-03-09 08:21:14,381 - INFO - [Train] [1/10] | Loss: 0.5080 | Train Acc: 80.89%
+2026-03-09 08:21:53,112 - INFO - [Valid] [1/10] | Loss: 0.4410 | Val Acc: 84.67%
+2026-03-09 08:21:53,242 - INFO - [Metrics for 'Normal'] | Precision: 0.8308 | Recall: 0.8913 | F1: 0.8600
+2026-03-09 08:21:53,242 - INFO - [Metrics for 'Defect'] | Precision: 0.8675 | Recall: 0.7968 | F1: 0.8306
+2026-03-09 08:21:53,297 - INFO - [Best Model Saved] (val loss: 0.4410) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 08:21:53,297 - INFO - --------------------------------------------------
+2026-03-09 08:21:53,298 - INFO - [LR]    [2/10] | Learning Rate: 0.000978
+2026-03-09 08:29:12,137 - INFO - [Train] [2/10] | Loss: 0.4319 | Train Acc: 85.33%
+2026-03-09 08:29:50,656 - INFO - [Valid] [2/10] | Loss: 0.4146 | Val Acc: 86.33%
+2026-03-09 08:29:50,785 - INFO - [Metrics for 'Normal'] | Precision: 0.8894 | Recall: 0.8465 | F1: 0.8674
+2026-03-09 08:29:50,785 - INFO - [Metrics for 'Defect'] | Precision: 0.8370 | Recall: 0.8821 | F1: 0.8590
+2026-03-09 08:29:50,842 - INFO - [Best Model Saved] (val loss: 0.4146) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 08:29:50,842 - INFO - --------------------------------------------------
+2026-03-09 08:29:50,843 - INFO - [LR]    [3/10] | Learning Rate: 0.000914
+2026-03-09 08:37:09,836 - INFO - [Train] [3/10] | Loss: 0.4215 | Train Acc: 86.10%
+2026-03-09 08:37:48,291 - INFO - [Valid] [3/10] | Loss: 0.3975 | Val Acc: 87.41%
+2026-03-09 08:37:48,449 - INFO - [Metrics for 'Normal'] | Precision: 0.8934 | Recall: 0.8649 | F1: 0.8789
+2026-03-09 08:37:48,449 - INFO - [Metrics for 'Defect'] | Precision: 0.8540 | Recall: 0.8845 | F1: 0.8690
+2026-03-09 08:37:48,520 - INFO - [Best Model Saved] (val loss: 0.3975) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 08:37:48,520 - INFO - --------------------------------------------------
+2026-03-09 08:37:48,521 - INFO - [LR]    [4/10] | Learning Rate: 0.000815
+2026-03-09 08:45:07,901 - INFO - [Train] [4/10] | Loss: 0.4027 | Train Acc: 87.33%
+2026-03-09 08:45:46,429 - INFO - [Valid] [4/10] | Loss: 0.3905 | Val Acc: 87.90%
+2026-03-09 08:45:46,568 - INFO - [Metrics for 'Normal'] | Precision: 0.8933 | Recall: 0.8755 | F1: 0.8843
+2026-03-09 08:45:46,568 - INFO - [Metrics for 'Defect'] | Precision: 0.8637 | Recall: 0.8830 | F1: 0.8732
+2026-03-09 08:45:46,626 - INFO - [Best Model Saved] (val loss: 0.3905) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 08:45:46,626 - INFO - --------------------------------------------------
+2026-03-09 08:45:46,626 - INFO - [LR]    [5/10] | Learning Rate: 0.000689
+2026-03-09 08:53:06,364 - INFO - [Train] [5/10] | Loss: 0.3855 | Train Acc: 88.35%
+2026-03-09 08:53:44,767 - INFO - [Valid] [5/10] | Loss: 0.3839 | Val Acc: 88.84%
+2026-03-09 08:53:44,895 - INFO - [Metrics for 'Normal'] | Precision: 0.9073 | Recall: 0.8784 | F1: 0.8926
+2026-03-09 08:53:44,895 - INFO - [Metrics for 'Defect'] | Precision: 0.8686 | Recall: 0.8996 | F1: 0.8838
+2026-03-09 08:53:44,952 - INFO - [Best Model Saved] (val loss: 0.3839) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 08:53:44,953 - INFO - --------------------------------------------------
+2026-03-09 08:53:44,953 - INFO - [LR]    [6/10] | Learning Rate: 0.000550
+2026-03-09 09:01:04,953 - INFO - [Train] [6/10] | Loss: 0.3734 | Train Acc: 89.18%
+2026-03-09 09:01:43,757 - INFO - [Valid] [6/10] | Loss: 0.3843 | Val Acc: 89.15%
+2026-03-09 09:01:43,927 - INFO - [Metrics for 'Normal'] | Precision: 0.9214 | Recall: 0.8687 | F1: 0.8943
+2026-03-09 09:01:43,927 - INFO - [Metrics for 'Defect'] | Precision: 0.8619 | Recall: 0.9171 | F1: 0.8886
+2026-03-09 09:01:43,981 - INFO - --------------------------------------------------
+2026-03-09 09:01:43,982 - INFO - [LR]    [7/10] | Learning Rate: 0.000411
+2026-03-09 09:09:05,927 - INFO - [Train] [7/10] | Loss: 0.3622 | Train Acc: 89.93%
+2026-03-09 09:09:44,423 - INFO - [Valid] [7/10] | Loss: 0.3643 | Val Acc: 89.69%
+2026-03-09 09:09:44,563 - INFO - [Metrics for 'Normal'] | Precision: 0.9106 | Recall: 0.8924 | F1: 0.9014
+2026-03-09 09:09:44,563 - INFO - [Metrics for 'Defect'] | Precision: 0.8822 | Recall: 0.9019 | F1: 0.8920
+2026-03-09 09:09:44,621 - INFO - [Best Model Saved] (val loss: 0.3643) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 09:09:44,621 - INFO - --------------------------------------------------
+2026-03-09 09:09:44,622 - INFO - [LR]    [8/10] | Learning Rate: 0.000285
+2026-03-09 09:17:06,759 - INFO - [Train] [8/10] | Loss: 0.3514 | Train Acc: 90.62%
+2026-03-09 09:17:45,303 - INFO - [Valid] [8/10] | Loss: 0.3813 | Val Acc: 89.78%
+2026-03-09 09:17:45,434 - INFO - [Metrics for 'Normal'] | Precision: 0.9094 | Recall: 0.8956 | F1: 0.9025
+2026-03-09 09:17:45,434 - INFO - [Metrics for 'Defect'] | Precision: 0.8851 | Recall: 0.9001 | F1: 0.8926
+2026-03-09 09:17:45,478 - INFO - --------------------------------------------------
+2026-03-09 09:17:45,479 - INFO - [LR]    [9/10] | Learning Rate: 0.000186
+2026-03-09 09:25:06,939 - INFO - [Train] [9/10] | Loss: 0.3418 | Train Acc: 91.22%
+2026-03-09 09:25:45,597 - INFO - [Valid] [9/10] | Loss: 0.3719 | Val Acc: 89.79%
+2026-03-09 09:25:45,770 - INFO - [Metrics for 'Normal'] | Precision: 0.9091 | Recall: 0.8962 | F1: 0.9026
+2026-03-09 09:25:45,770 - INFO - [Metrics for 'Defect'] | Precision: 0.8857 | Recall: 0.8997 | F1: 0.8926
+2026-03-09 09:25:45,826 - INFO - --------------------------------------------------
+2026-03-09 09:25:45,826 - INFO - [LR]    [10/10] | Learning Rate: 0.000122
+2026-03-09 09:33:07,829 - INFO - [Train] [10/10] | Loss: 0.3343 | Train Acc: 91.77%
+2026-03-09 09:33:46,573 - INFO - [Valid] [10/10] | Loss: 0.3660 | Val Acc: 89.98%
+2026-03-09 09:33:46,720 - INFO - [Metrics for 'Normal'] | Precision: 0.9136 | Recall: 0.8948 | F1: 0.9041
+2026-03-09 09:33:46,720 - INFO - [Metrics for 'Defect'] | Precision: 0.8850 | Recall: 0.9053 | F1: 0.8950
+2026-03-09 09:33:46,765 - INFO - ================================================================================
+2026-03-09 09:33:46,765 - INFO - 단계 2/2: Pruning 및 미세 조정(Fine-tuning)을 시작합니다.
+2026-03-09 09:33:46,765 - INFO - ================================================================================
+2026-03-09 09:33:46,788 - INFO - 사전 훈련된 모델 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'을(를) 불러왔습니다.
+2026-03-09 09:33:46,807 - INFO - Pruning 전 원본 모델의 FLOPs를 측정합니다.
+2026-03-09 09:33:46,829 - INFO - Wanda Pruning을 시작합니다.
+2026-03-09 09:33:46,829 - INFO - Wanda 중요도 계산을 위해 Calibration을 수행합니다.
+2026-03-09 09:33:46,830 - INFO -   - Calibration Samples: 4096 (approx 16 batches)
+2026-03-09 09:33:50,088 - INFO - 분류 레이어 'Linear'을(를) Pruning 대상에서 제외합니다.
+2026-03-09 09:33:50,245 - INFO - torch-pruning 완료. 모델 구조가 희소도(0.2451)에 맞춰 변경되었습니다.
+2026-03-09 09:33:50,245 - INFO - ==================================================
+2026-03-09 09:33:50,247 - INFO - ==================================================
+2026-03-09 09:33:50,247 - INFO - 모델 파라미터 수:
+2026-03-09 09:33:50,247 - INFO -   - 총 파라미터: 1,432,867 개
+2026-03-09 09:33:50,247 - INFO -   - 학습 가능한 파라미터: 1,432,867 개
+2026-03-09 09:33:50,289 - INFO - Pruning 후 모델의 FLOPs를 측정합니다.
+2026-03-09 09:33:50,342 - INFO - FLOPs가 0.3853 GFLOPs에서 0.2266 GFLOPs로 감소했습니다 (감소율: 41.19%).
+2026-03-09 09:33:50,365 - INFO - Pruning 정보(희소도: 0.2451)를 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/pruning_info.yaml'에 저장했습니다.
+2026-03-09 09:33:50,365 - INFO - 미세 조정을 위한 새로운 옵티마이저와 스케줄러를 생성합니다.
+2026-03-09 09:33:50,365 - INFO - 옵티마이저: AdamW (lr=0.001, weight_decay=0.0001)
+2026-03-09 09:33:50,366 - INFO - 스케줄러: CosineAnnealingLR (T_max=80, eta_min=0.0001)
+2026-03-09 09:33:50,366 - INFO - ==================================================
+2026-03-09 09:33:50,366 - INFO - train 모드를 시작합니다.
+2026-03-09 09:33:50,366 - INFO - 손실 함수: CrossEntropyLoss (label_smoothing: 0.1)
+2026-03-09 09:33:50,366 - INFO - Best metric을 초기값(inf)으로 설정합니다.
+2026-03-09 09:33:50,366 - INFO - --------------------------------------------------
+2026-03-09 09:33:50,367 - INFO - [LR]    [11/90] | Learning Rate: 0.001000
+2026-03-09 09:41:13,255 - INFO - [Train] [11/90] | Loss: 0.3859 | Train Acc: 88.48%
+2026-03-09 09:41:51,977 - INFO - [Valid] [11/90] | Loss: 0.3856 | Val Acc: 88.33%
+2026-03-09 09:41:52,117 - INFO - [Metrics for 'Normal'] | Precision: 0.9178 | Recall: 0.8557 | F1: 0.8857
+2026-03-09 09:41:52,117 - INFO - [Metrics for 'Defect'] | Precision: 0.8499 | Recall: 0.9142 | F1: 0.8809
+2026-03-09 09:41:52,172 - INFO - [Best Model Saved] (val loss: 0.3856) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 09:41:52,173 - INFO - --------------------------------------------------
+2026-03-09 09:41:52,173 - INFO - [LR]    [12/90] | Learning Rate: 0.001000
+2026-03-09 09:49:11,992 - INFO - [Train] [12/90] | Loss: 0.3761 | Train Acc: 89.08%
+2026-03-09 09:49:50,783 - INFO - [Valid] [12/90] | Loss: 0.3835 | Val Acc: 88.74%
+2026-03-09 09:49:50,913 - INFO - [Metrics for 'Normal'] | Precision: 0.9213 | Recall: 0.8602 | F1: 0.8897
+2026-03-09 09:49:50,913 - INFO - [Metrics for 'Defect'] | Precision: 0.8544 | Recall: 0.9177 | F1: 0.8849
+2026-03-09 09:49:50,968 - INFO - [Best Model Saved] (val loss: 0.3835) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 09:49:50,968 - INFO - --------------------------------------------------
+2026-03-09 09:49:50,969 - INFO - [LR]    [13/90] | Learning Rate: 0.000999
+2026-03-09 09:57:11,065 - INFO - [Train] [13/90] | Loss: 0.3813 | Train Acc: 88.81%
+2026-03-09 09:57:49,340 - INFO - [Valid] [13/90] | Loss: 0.3740 | Val Acc: 89.39%
+2026-03-09 09:57:49,481 - INFO - [Metrics for 'Normal'] | Precision: 0.9142 | Recall: 0.8819 | F1: 0.8977
+2026-03-09 09:57:49,481 - INFO - [Metrics for 'Defect'] | Precision: 0.8728 | Recall: 0.9074 | F1: 0.8898
+2026-03-09 09:57:49,537 - INFO - [Best Model Saved] (val loss: 0.3740) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 09:57:49,537 - INFO - --------------------------------------------------
+2026-03-09 09:57:49,537 - INFO - [LR]    [14/90] | Learning Rate: 0.000997
+2026-03-09 10:05:09,446 - INFO - [Train] [14/90] | Loss: 0.3767 | Train Acc: 89.13%
+2026-03-09 10:05:48,074 - INFO - [Valid] [14/90] | Loss: 0.3733 | Val Acc: 89.56%
+2026-03-09 10:05:48,204 - INFO - [Metrics for 'Normal'] | Precision: 0.9139 | Recall: 0.8858 | F1: 0.8997
+2026-03-09 10:05:48,204 - INFO - [Metrics for 'Defect'] | Precision: 0.8765 | Recall: 0.9066 | F1: 0.8913
+2026-03-09 10:05:48,260 - INFO - [Best Model Saved] (val loss: 0.3733) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 10:05:48,260 - INFO - --------------------------------------------------
+2026-03-09 10:05:48,261 - INFO - [LR]    [15/90] | Learning Rate: 0.000994
+2026-03-09 10:13:08,683 - INFO - [Train] [15/90] | Loss: 0.3747 | Train Acc: 89.20%
+2026-03-09 10:13:47,190 - INFO - [Valid] [15/90] | Loss: 0.3783 | Val Acc: 89.63%
+2026-03-09 10:13:47,331 - INFO - [Metrics for 'Normal'] | Precision: 0.9089 | Recall: 0.8931 | F1: 0.9009
+2026-03-09 10:13:47,331 - INFO - [Metrics for 'Defect'] | Precision: 0.8827 | Recall: 0.8998 | F1: 0.8912
+2026-03-09 10:13:47,375 - INFO - --------------------------------------------------
+2026-03-09 10:13:47,375 - INFO - [LR]    [16/90] | Learning Rate: 0.000991
+2026-03-09 10:21:08,035 - INFO - [Train] [16/90] | Loss: 0.3715 | Train Acc: 89.49%
+2026-03-09 10:21:46,516 - INFO - [Valid] [16/90] | Loss: 0.3660 | Val Acc: 89.68%
+2026-03-09 10:21:46,657 - INFO - [Metrics for 'Normal'] | Precision: 0.9153 | Recall: 0.8866 | F1: 0.9007
+2026-03-09 10:21:46,657 - INFO - [Metrics for 'Defect'] | Precision: 0.8774 | Recall: 0.9081 | F1: 0.8925
+2026-03-09 10:21:46,724 - INFO - [Best Model Saved] (val loss: 0.3660) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 10:21:46,724 - INFO - --------------------------------------------------
+2026-03-09 10:21:46,724 - INFO - [LR]    [17/90] | Learning Rate: 0.000988
+2026-03-09 10:29:07,144 - INFO - [Train] [17/90] | Loss: 0.3614 | Train Acc: 90.04%
+2026-03-09 10:29:45,777 - INFO - [Valid] [17/90] | Loss: 0.3602 | Val Acc: 90.10%
+2026-03-09 10:29:45,948 - INFO - [Metrics for 'Normal'] | Precision: 0.9123 | Recall: 0.8990 | F1: 0.9056
+2026-03-09 10:29:45,948 - INFO - [Metrics for 'Defect'] | Precision: 0.8888 | Recall: 0.9033 | F1: 0.8960
+2026-03-09 10:29:46,019 - INFO - [Best Model Saved] (val loss: 0.3602) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 10:29:46,019 - INFO - --------------------------------------------------
+2026-03-09 10:29:46,020 - INFO - [LR]    [18/90] | Learning Rate: 0.000983
+2026-03-09 10:37:06,795 - INFO - [Train] [18/90] | Loss: 0.3614 | Train Acc: 90.09%
+2026-03-09 10:37:45,406 - INFO - [Valid] [18/90] | Loss: 0.3567 | Val Acc: 90.22%
+2026-03-09 10:37:45,584 - INFO - [Metrics for 'Normal'] | Precision: 0.9168 | Recall: 0.8962 | F1: 0.9064
+2026-03-09 10:37:45,584 - INFO - [Metrics for 'Defect'] | Precision: 0.8866 | Recall: 0.9090 | F1: 0.8977
+2026-03-09 10:37:45,648 - INFO - [Best Model Saved] (val loss: 0.3567) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 10:37:45,648 - INFO - --------------------------------------------------
+2026-03-09 10:37:45,648 - INFO - [LR]    [19/90] | Learning Rate: 0.000978
+2026-03-09 10:45:05,771 - INFO - [Train] [19/90] | Loss: 0.3541 | Train Acc: 90.51%
+2026-03-09 10:45:44,538 - INFO - [Valid] [19/90] | Loss: 0.3612 | Val Acc: 90.12%
+2026-03-09 10:45:44,679 - INFO - [Metrics for 'Normal'] | Precision: 0.9162 | Recall: 0.8948 | F1: 0.9053
+2026-03-09 10:45:44,679 - INFO - [Metrics for 'Defect'] | Precision: 0.8852 | Recall: 0.9084 | F1: 0.8966
+2026-03-09 10:45:44,723 - INFO - --------------------------------------------------
+2026-03-09 10:45:44,724 - INFO - [LR]    [20/90] | Learning Rate: 0.000972
+2026-03-09 10:53:04,608 - INFO - [Train] [20/90] | Loss: 0.3522 | Train Acc: 90.62%
+2026-03-09 10:53:42,692 - INFO - [Valid] [20/90] | Loss: 0.3656 | Val Acc: 90.19%
+2026-03-09 10:53:42,869 - INFO - [Metrics for 'Normal'] | Precision: 0.9246 | Recall: 0.8866 | F1: 0.9052
+2026-03-09 10:53:42,869 - INFO - [Metrics for 'Defect'] | Precision: 0.8786 | Recall: 0.9190 | F1: 0.8984
+2026-03-09 10:53:42,928 - INFO - --------------------------------------------------
+2026-03-09 10:53:42,928 - INFO - [LR]    [21/90] | Learning Rate: 0.000966
+2026-03-09 11:01:04,817 - INFO - [Train] [21/90] | Loss: 0.3530 | Train Acc: 90.62%
+2026-03-09 11:01:43,481 - INFO - [Valid] [21/90] | Loss: 0.3539 | Val Acc: 90.43%
+2026-03-09 11:01:43,623 - INFO - [Metrics for 'Normal'] | Precision: 0.9169 | Recall: 0.9005 | F1: 0.9086
+2026-03-09 11:01:43,623 - INFO - [Metrics for 'Defect'] | Precision: 0.8908 | Recall: 0.9086 | F1: 0.8996
+2026-03-09 11:01:43,719 - INFO - [Best Model Saved] (val loss: 0.3539) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 11:01:43,719 - INFO - --------------------------------------------------
+2026-03-09 11:01:43,720 - INFO - [LR]    [22/90] | Learning Rate: 0.000959
+2026-03-09 11:09:04,470 - INFO - [Train] [22/90] | Loss: 0.3465 | Train Acc: 91.03%
+2026-03-09 11:09:42,960 - INFO - [Valid] [22/90] | Loss: 0.3537 | Val Acc: 90.46%
+2026-03-09 11:09:43,137 - INFO - [Metrics for 'Normal'] | Precision: 0.9137 | Recall: 0.9050 | F1: 0.9093
+2026-03-09 11:09:43,137 - INFO - [Metrics for 'Defect'] | Precision: 0.8948 | Recall: 0.9043 | F1: 0.8995
+2026-03-09 11:09:43,206 - INFO - [Best Model Saved] (val loss: 0.3537) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 11:09:43,206 - INFO - --------------------------------------------------
+2026-03-09 11:09:43,207 - INFO - [LR]    [23/90] | Learning Rate: 0.000951
+2026-03-09 11:17:03,322 - INFO - [Train] [23/90] | Loss: 0.3435 | Train Acc: 91.24%
+2026-03-09 11:17:41,750 - INFO - [Valid] [23/90] | Loss: 0.3801 | Val Acc: 90.20%
+2026-03-09 11:17:41,895 - INFO - [Metrics for 'Normal'] | Precision: 0.9144 | Recall: 0.8986 | F1: 0.9064
+2026-03-09 11:17:41,895 - INFO - [Metrics for 'Defect'] | Precision: 0.8887 | Recall: 0.9059 | F1: 0.8972
+2026-03-09 11:17:41,940 - INFO - --------------------------------------------------
+2026-03-09 11:17:41,940 - INFO - [LR]    [24/90] | Learning Rate: 0.000943
+2026-03-09 11:25:01,869 - INFO - [Train] [24/90] | Loss: 0.3486 | Train Acc: 90.88%
+2026-03-09 11:25:40,152 - INFO - [Valid] [24/90] | Loss: 0.3510 | Val Acc: 90.63%
+2026-03-09 11:25:40,294 - INFO - [Metrics for 'Normal'] | Precision: 0.9209 | Recall: 0.8998 | F1: 0.9102
+2026-03-09 11:25:40,294 - INFO - [Metrics for 'Defect'] | Precision: 0.8906 | Recall: 0.9136 | F1: 0.9019
+2026-03-09 11:25:40,350 - INFO - [Best Model Saved] (val loss: 0.3510) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 11:25:40,350 - INFO - --------------------------------------------------
+2026-03-09 11:25:40,351 - INFO - [LR]    [25/90] | Learning Rate: 0.000934
+2026-03-09 11:33:00,301 - INFO - [Train] [25/90] | Loss: 0.3395 | Train Acc: 91.50%
+2026-03-09 11:33:39,002 - INFO - [Valid] [25/90] | Loss: 0.3566 | Val Acc: 90.26%
+2026-03-09 11:33:39,152 - INFO - [Metrics for 'Normal'] | Precision: 0.9104 | Recall: 0.9046 | F1: 0.9075
+2026-03-09 11:33:39,152 - INFO - [Metrics for 'Defect'] | Precision: 0.8940 | Recall: 0.9003 | F1: 0.8971
+2026-03-09 11:33:39,197 - INFO - --------------------------------------------------
+2026-03-09 11:33:39,197 - INFO - [LR]    [26/90] | Learning Rate: 0.000924
+2026-03-09 11:41:00,703 - INFO - [Train] [26/90] | Loss: 0.3361 | Train Acc: 91.64%
+2026-03-09 11:41:39,325 - INFO - [Valid] [26/90] | Loss: 0.3508 | Val Acc: 90.67%
+2026-03-09 11:41:39,467 - INFO - [Metrics for 'Normal'] | Precision: 0.9126 | Recall: 0.9106 | F1: 0.9116
+2026-03-09 11:41:39,467 - INFO - [Metrics for 'Defect'] | Precision: 0.9002 | Recall: 0.9024 | F1: 0.9013
+2026-03-09 11:41:39,523 - INFO - [Best Model Saved] (val loss: 0.3508) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 11:41:39,523 - INFO - --------------------------------------------------
+2026-03-09 11:41:39,524 - INFO - [LR]    [27/90] | Learning Rate: 0.000914
+2026-03-09 11:48:59,120 - INFO - [Train] [27/90] | Loss: 0.3333 | Train Acc: 91.81%
+2026-03-09 11:49:37,144 - INFO - [Valid] [27/90] | Loss: 0.3520 | Val Acc: 90.57%
+2026-03-09 11:49:37,276 - INFO - [Metrics for 'Normal'] | Precision: 0.9193 | Recall: 0.9005 | F1: 0.9098
+2026-03-09 11:49:37,276 - INFO - [Metrics for 'Defect'] | Precision: 0.8912 | Recall: 0.9115 | F1: 0.9012
+2026-03-09 11:49:37,321 - INFO - --------------------------------------------------
+2026-03-09 11:49:37,322 - INFO - [LR]    [28/90] | Learning Rate: 0.000903
+2026-03-09 11:56:57,244 - INFO - [Train] [28/90] | Loss: 0.3306 | Train Acc: 92.02%
+2026-03-09 11:57:35,421 - INFO - [Valid] [28/90] | Loss: 0.3515 | Val Acc: 90.60%
+2026-03-09 11:57:35,554 - INFO - [Metrics for 'Normal'] | Precision: 0.9152 | Recall: 0.9059 | F1: 0.9106
+2026-03-09 11:57:35,554 - INFO - [Metrics for 'Defect'] | Precision: 0.8959 | Recall: 0.9061 | F1: 0.9010
+2026-03-09 11:57:35,599 - INFO - --------------------------------------------------
+2026-03-09 11:57:35,599 - INFO - [LR]    [29/90] | Learning Rate: 0.000892
+2026-03-09 12:04:56,438 - INFO - [Train] [29/90] | Loss: 0.3309 | Train Acc: 92.08%
+2026-03-09 12:05:35,259 - INFO - [Valid] [29/90] | Loss: 0.3521 | Val Acc: 90.60%
+2026-03-09 12:05:35,392 - INFO - [Metrics for 'Normal'] | Precision: 0.9240 | Recall: 0.8957 | F1: 0.9096
+2026-03-09 12:05:35,392 - INFO - [Metrics for 'Defect'] | Precision: 0.8872 | Recall: 0.9175 | F1: 0.9021
+2026-03-09 12:05:35,437 - INFO - --------------------------------------------------
+2026-03-09 12:05:35,437 - INFO - [LR]    [30/90] | Learning Rate: 0.000880
+2026-03-09 12:12:55,650 - INFO - [Train] [30/90] | Loss: 0.3276 | Train Acc: 92.26%
+2026-03-09 12:13:34,327 - INFO - [Valid] [30/90] | Loss: 0.3512 | Val Acc: 90.64%
+2026-03-09 12:13:34,470 - INFO - [Metrics for 'Normal'] | Precision: 0.9196 | Recall: 0.9015 | F1: 0.9105
+2026-03-09 12:13:34,470 - INFO - [Metrics for 'Defect'] | Precision: 0.8921 | Recall: 0.9118 | F1: 0.9019
+2026-03-09 12:13:34,515 - INFO - --------------------------------------------------
+2026-03-09 12:13:34,516 - INFO - [LR]    [31/90] | Learning Rate: 0.000868
+2026-03-09 12:20:54,793 - INFO - [Train] [31/90] | Loss: 0.3254 | Train Acc: 92.40%
+2026-03-09 12:21:33,522 - INFO - [Valid] [31/90] | Loss: 0.3696 | Val Acc: 90.44%
+2026-03-09 12:21:33,669 - INFO - [Metrics for 'Normal'] | Precision: 0.9092 | Recall: 0.9100 | F1: 0.9096
+2026-03-09 12:21:33,669 - INFO - [Metrics for 'Defect'] | Precision: 0.8991 | Recall: 0.8982 | F1: 0.8987
+2026-03-09 12:21:33,714 - INFO - --------------------------------------------------
+2026-03-09 12:21:33,715 - INFO - [LR]    [32/90] | Learning Rate: 0.000855
+2026-03-09 12:28:54,268 - INFO - [Train] [32/90] | Loss: 0.3236 | Train Acc: 92.50%
+2026-03-09 12:29:32,573 - INFO - [Valid] [32/90] | Loss: 0.3505 | Val Acc: 90.69%
+2026-03-09 12:29:32,705 - INFO - [Metrics for 'Normal'] | Precision: 0.9238 | Recall: 0.8977 | F1: 0.9106
+2026-03-09 12:29:32,705 - INFO - [Metrics for 'Defect'] | Precision: 0.8890 | Recall: 0.9172 | F1: 0.9029
+2026-03-09 12:29:32,763 - INFO - [Best Model Saved] (val loss: 0.3505) -> 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 12:29:32,763 - INFO - --------------------------------------------------
+2026-03-09 12:29:32,764 - INFO - [LR]    [33/90] | Learning Rate: 0.000842
+2026-03-09 12:36:53,521 - INFO - [Train] [33/90] | Loss: 0.3214 | Train Acc: 92.67%
+2026-03-09 12:37:32,389 - INFO - [Valid] [33/90] | Loss: 0.4353 | Val Acc: 90.39%
+2026-03-09 12:37:32,547 - INFO - [Metrics for 'Normal'] | Precision: 0.9240 | Recall: 0.8914 | F1: 0.9074
+2026-03-09 12:37:32,547 - INFO - [Metrics for 'Defect'] | Precision: 0.8831 | Recall: 0.9180 | F1: 0.9002
+2026-03-09 12:37:32,593 - INFO - --------------------------------------------------
+2026-03-09 12:37:32,594 - INFO - [LR]    [34/90] | Learning Rate: 0.000829
+2026-03-09 12:44:54,199 - INFO - [Train] [34/90] | Loss: 0.3183 | Train Acc: 92.84%
+2026-03-09 12:45:32,807 - INFO - [Valid] [34/90] | Loss: 0.3532 | Val Acc: 90.70%
+2026-03-09 12:45:32,939 - INFO - [Metrics for 'Normal'] | Precision: 0.9220 | Recall: 0.9001 | F1: 0.9109
+2026-03-09 12:45:32,939 - INFO - [Metrics for 'Defect'] | Precision: 0.8911 | Recall: 0.9147 | F1: 0.9028
+2026-03-09 12:45:32,984 - INFO - --------------------------------------------------
+2026-03-09 12:45:32,985 - INFO - [LR]    [35/90] | Learning Rate: 0.000815
+2026-03-09 12:52:55,098 - INFO - [Train] [35/90] | Loss: 0.3160 | Train Acc: 93.04%
+2026-03-09 12:53:33,445 - INFO - [Valid] [35/90] | Loss: 0.3772 | Val Acc: 90.73%
+2026-03-09 12:53:33,615 - INFO - [Metrics for 'Normal'] | Precision: 0.9205 | Recall: 0.9024 | F1: 0.9114
+2026-03-09 12:53:33,615 - INFO - [Metrics for 'Defect'] | Precision: 0.8932 | Recall: 0.9128 | F1: 0.9029
+2026-03-09 12:53:33,674 - INFO - --------------------------------------------------
+2026-03-09 12:53:33,674 - INFO - [LR]    [36/90] | Learning Rate: 0.000800
+2026-03-09 13:00:55,544 - INFO - [Train] [36/90] | Loss: 0.3193 | Train Acc: 92.97%
+2026-03-09 13:01:34,302 - INFO - [Valid] [36/90] | Loss: 0.3542 | Val Acc: 90.54%
+2026-03-09 13:01:34,435 - INFO - [Metrics for 'Normal'] | Precision: 0.9174 | Recall: 0.9021 | F1: 0.9097
+2026-03-09 13:01:34,435 - INFO - [Metrics for 'Defect'] | Precision: 0.8924 | Recall: 0.9091 | F1: 0.9007
+2026-03-09 13:01:34,480 - INFO - --------------------------------------------------
+2026-03-09 13:01:34,481 - INFO - [LR]    [37/90] | Learning Rate: 0.000785
+2026-03-09 13:08:54,060 - INFO - [Train] [37/90] | Loss: 0.3098 | Train Acc: 93.39%
+2026-03-09 13:09:32,759 - INFO - [Valid] [37/90] | Loss: 0.3513 | Val Acc: 90.87%
+2026-03-09 13:09:32,904 - INFO - [Metrics for 'Normal'] | Precision: 0.9231 | Recall: 0.9023 | F1: 0.9126
+2026-03-09 13:09:32,904 - INFO - [Metrics for 'Defect'] | Precision: 0.8934 | Recall: 0.9159 | F1: 0.9045
+2026-03-09 13:09:32,949 - INFO - --------------------------------------------------
+2026-03-09 13:09:32,950 - INFO - [LR]    [38/90] | Learning Rate: 0.000770
+2026-03-09 13:16:52,187 - INFO - [Train] [38/90] | Loss: 0.3113 | Train Acc: 93.36%
+2026-03-09 13:17:30,655 - INFO - [Valid] [38/90] | Loss: 0.4496 | Val Acc: 90.61%
+2026-03-09 13:17:30,798 - INFO - [Metrics for 'Normal'] | Precision: 0.9195 | Recall: 0.9010 | F1: 0.9102
+2026-03-09 13:17:30,798 - INFO - [Metrics for 'Defect'] | Precision: 0.8916 | Recall: 0.9117 | F1: 0.9016
+2026-03-09 13:17:30,843 - INFO - --------------------------------------------------
+2026-03-09 13:17:30,844 - INFO - [LR]    [39/90] | Learning Rate: 0.000754
+2026-03-09 13:24:51,721 - INFO - [Train] [39/90] | Loss: 0.3088 | Train Acc: 93.51%
+2026-03-09 13:25:30,309 - INFO - [Valid] [39/90] | Loss: 0.3683 | Val Acc: 90.65%
+2026-03-09 13:25:30,453 - INFO - [Metrics for 'Normal'] | Precision: 0.9226 | Recall: 0.8984 | F1: 0.9103
+2026-03-09 13:25:30,453 - INFO - [Metrics for 'Defect'] | Precision: 0.8895 | Recall: 0.9156 | F1: 0.9024
+2026-03-09 13:25:30,498 - INFO - --------------------------------------------------
+2026-03-09 13:25:30,499 - INFO - [LR]    [40/90] | Learning Rate: 0.000738
+2026-03-09 13:32:51,927 - INFO - [Train] [40/90] | Loss: 0.3068 | Train Acc: 93.61%
+2026-03-09 13:33:30,560 - INFO - [Valid] [40/90] | Loss: 0.3836 | Val Acc: 90.49%
+2026-03-09 13:33:30,703 - INFO - [Metrics for 'Normal'] | Precision: 0.9183 | Recall: 0.8999 | F1: 0.9090
+2026-03-09 13:33:30,703 - INFO - [Metrics for 'Defect'] | Precision: 0.8904 | Recall: 0.9104 | F1: 0.9003
+2026-03-09 13:33:30,749 - INFO - --------------------------------------------------
+2026-03-09 13:33:30,750 - INFO - [LR]    [41/90] | Learning Rate: 0.000722
+2026-03-09 13:40:50,266 - INFO - [Train] [41/90] | Loss: 0.3058 | Train Acc: 93.73%
+2026-03-09 13:41:28,553 - INFO - [Valid] [41/90] | Loss: 0.3854 | Val Acc: 90.42%
+2026-03-09 13:41:28,687 - INFO - [Metrics for 'Normal'] | Precision: 0.9167 | Recall: 0.9003 | F1: 0.9084
+2026-03-09 13:41:28,687 - INFO - [Metrics for 'Defect'] | Precision: 0.8906 | Recall: 0.9085 | F1: 0.8995
+2026-03-09 13:41:28,733 - INFO - --------------------------------------------------
+2026-03-09 13:41:28,733 - INFO - [LR]    [42/90] | Learning Rate: 0.000706
+2026-03-09 13:48:49,908 - INFO - [Train] [42/90] | Loss: 0.3039 | Train Acc: 93.85%
+2026-03-09 13:49:28,589 - INFO - [Valid] [42/90] | Loss: 0.3589 | Val Acc: 90.57%
+2026-03-09 13:49:28,754 - INFO - [Metrics for 'Normal'] | Precision: 0.9214 | Recall: 0.8981 | F1: 0.9096
+2026-03-09 13:49:28,754 - INFO - [Metrics for 'Defect'] | Precision: 0.8891 | Recall: 0.9142 | F1: 0.9015
+2026-03-09 13:49:28,800 - INFO - --------------------------------------------------
+2026-03-09 13:49:28,801 - INFO - [LR]    [43/90] | Learning Rate: 0.000689
+2026-03-09 13:56:51,711 - INFO - [Train] [43/90] | Loss: 0.3017 | Train Acc: 93.97%
+2026-03-09 13:57:30,232 - INFO - [Valid] [43/90] | Loss: 0.3576 | Val Acc: 90.50%
+2026-03-09 13:57:30,375 - INFO - [Metrics for 'Normal'] | Precision: 0.9208 | Recall: 0.8972 | F1: 0.9089
+2026-03-09 13:57:30,375 - INFO - [Metrics for 'Defect'] | Precision: 0.8882 | Recall: 0.9136 | F1: 0.9007
+2026-03-09 13:57:30,421 - INFO - --------------------------------------------------
+2026-03-09 13:57:30,421 - INFO - [LR]    [44/90] | Learning Rate: 0.000672
+2026-03-09 14:04:50,381 - INFO - [Train] [44/90] | Loss: 0.2984 | Train Acc: 94.17%
+2026-03-09 14:05:29,331 - INFO - [Valid] [44/90] | Loss: 0.3578 | Val Acc: 90.48%
+2026-03-09 14:05:29,490 - INFO - [Metrics for 'Normal'] | Precision: 0.9245 | Recall: 0.8927 | F1: 0.9083
+2026-03-09 14:05:29,490 - INFO - [Metrics for 'Defect'] | Precision: 0.8844 | Recall: 0.9184 | F1: 0.9011
+2026-03-09 14:05:29,536 - INFO - --------------------------------------------------
+2026-03-09 14:05:29,536 - INFO - [LR]    [45/90] | Learning Rate: 0.000655
+2026-03-09 14:12:50,058 - INFO - [Train] [45/90] | Loss: 0.2972 | Train Acc: 94.26%
+2026-03-09 14:13:28,561 - INFO - [Valid] [45/90] | Loss: 0.3651 | Val Acc: 90.47%
+2026-03-09 14:13:28,728 - INFO - [Metrics for 'Normal'] | Precision: 0.9187 | Recall: 0.8991 | F1: 0.9088
+2026-03-09 14:13:28,728 - INFO - [Metrics for 'Defect'] | Precision: 0.8897 | Recall: 0.9109 | F1: 0.9002
+2026-03-09 14:13:28,786 - INFO - --------------------------------------------------
+2026-03-09 14:13:28,787 - INFO - [LR]    [46/90] | Learning Rate: 0.000638
+2026-03-09 14:20:48,971 - INFO - [Train] [46/90] | Loss: 0.2946 | Train Acc: 94.44%
+2026-03-09 14:21:27,198 - INFO - [Valid] [46/90] | Loss: 0.3583 | Val Acc: 90.51%
+2026-03-09 14:21:27,371 - INFO - [Metrics for 'Normal'] | Precision: 0.9242 | Recall: 0.8936 | F1: 0.9087
+2026-03-09 14:21:27,371 - INFO - [Metrics for 'Defect'] | Precision: 0.8852 | Recall: 0.9180 | F1: 0.9013
+2026-03-09 14:21:27,430 - INFO - --------------------------------------------------
+2026-03-09 14:21:27,431 - INFO - [LR]    [47/90] | Learning Rate: 0.000620
+2026-03-09 14:28:49,064 - INFO - [Train] [47/90] | Loss: 0.2927 | Train Acc: 94.55%
+2026-03-09 14:29:27,292 - INFO - [Valid] [47/90] | Loss: 0.3639 | Val Acc: 90.34%
+2026-03-09 14:29:27,471 - INFO - [Metrics for 'Normal'] | Precision: 0.9166 | Recall: 0.8989 | F1: 0.9077
+2026-03-09 14:29:27,471 - INFO - [Metrics for 'Defect'] | Precision: 0.8892 | Recall: 0.9085 | F1: 0.8987
+2026-03-09 14:29:27,530 - INFO - --------------------------------------------------
+2026-03-09 14:29:27,531 - INFO - [LR]    [48/90] | Learning Rate: 0.000603
+2026-03-09 14:36:49,003 - INFO - [Train] [48/90] | Loss: 0.2913 | Train Acc: 94.62%
+2026-03-09 14:37:27,764 - INFO - [Valid] [48/90] | Loss: 0.3637 | Val Acc: 90.43%
+2026-03-09 14:37:27,909 - INFO - [Metrics for 'Normal'] | Precision: 0.9169 | Recall: 0.9004 | F1: 0.9086
+2026-03-09 14:37:27,909 - INFO - [Metrics for 'Defect'] | Precision: 0.8908 | Recall: 0.9087 | F1: 0.8996
+2026-03-09 14:37:27,955 - INFO - --------------------------------------------------
+2026-03-09 14:37:27,956 - INFO - [LR]    [49/90] | Learning Rate: 0.000585
+2026-03-09 14:44:48,895 - INFO - [Train] [49/90] | Loss: 0.2887 | Train Acc: 94.82%
+2026-03-09 14:45:27,674 - INFO - [Valid] [49/90] | Loss: 0.3654 | Val Acc: 90.35%
+2026-03-09 14:45:27,842 - INFO - [Metrics for 'Normal'] | Precision: 0.9161 | Recall: 0.8997 | F1: 0.9078
+2026-03-09 14:45:27,842 - INFO - [Metrics for 'Defect'] | Precision: 0.8900 | Recall: 0.9078 | F1: 0.8988
+2026-03-09 14:45:27,888 - INFO - --------------------------------------------------
+2026-03-09 14:45:27,888 - INFO - [LR]    [50/90] | Learning Rate: 0.000568
+2026-03-09 14:52:47,615 - INFO - [Train] [50/90] | Loss: 0.2869 | Train Acc: 94.93%
+2026-03-09 14:53:26,096 - INFO - [Valid] [50/90] | Loss: 0.3649 | Val Acc: 90.30%
+2026-03-09 14:53:26,240 - INFO - [Metrics for 'Normal'] | Precision: 0.9153 | Recall: 0.8996 | F1: 0.9074
+2026-03-09 14:53:26,240 - INFO - [Metrics for 'Defect'] | Precision: 0.8898 | Recall: 0.9068 | F1: 0.8982
+2026-03-09 14:53:26,286 - INFO - --------------------------------------------------
+2026-03-09 14:53:26,287 - INFO - [LR]    [51/90] | Learning Rate: 0.000550
+2026-03-09 15:00:46,364 - INFO - [Train] [51/90] | Loss: 0.2846 | Train Acc: 95.08%
+2026-03-09 15:01:24,513 - INFO - [Valid] [51/90] | Loss: 0.3727 | Val Acc: 90.21%
+2026-03-09 15:01:24,653 - INFO - [Metrics for 'Normal'] | Precision: 0.9200 | Recall: 0.8923 | F1: 0.9059
+2026-03-09 15:01:24,653 - INFO - [Metrics for 'Defect'] | Precision: 0.8834 | Recall: 0.9132 | F1: 0.8980
+2026-03-09 15:01:24,709 - INFO - --------------------------------------------------
+2026-03-09 15:01:24,710 - INFO - [LR]    [52/90] | Learning Rate: 0.000532
+2026-03-09 15:08:45,262 - INFO - [Train] [52/90] | Loss: 0.2823 | Train Acc: 95.21%
+2026-03-09 15:09:24,013 - INFO - [Valid] [52/90] | Loss: 0.4015 | Val Acc: 89.97%
+2026-03-09 15:09:24,160 - INFO - [Metrics for 'Normal'] | Precision: 0.9202 | Recall: 0.8871 | F1: 0.9033
+2026-03-09 15:09:24,160 - INFO - [Metrics for 'Defect'] | Precision: 0.8785 | Recall: 0.9139 | F1: 0.8959
+2026-03-09 15:09:24,206 - INFO - --------------------------------------------------
+2026-03-09 15:09:24,207 - INFO - [LR]    [53/90] | Learning Rate: 0.000515
+2026-03-09 15:16:45,163 - INFO - [Train] [53/90] | Loss: 0.2807 | Train Acc: 95.33%
+2026-03-09 15:17:23,890 - INFO - [Valid] [53/90] | Loss: 0.3722 | Val Acc: 90.28%
+2026-03-09 15:17:24,042 - INFO - [Metrics for 'Normal'] | Precision: 0.9197 | Recall: 0.8941 | F1: 0.9067
+2026-03-09 15:17:24,042 - INFO - [Metrics for 'Defect'] | Precision: 0.8850 | Recall: 0.9127 | F1: 0.8986
+2026-03-09 15:17:24,088 - INFO - --------------------------------------------------
+2026-03-09 15:17:24,089 - INFO - [LR]    [54/90] | Learning Rate: 0.000497
+2026-03-09 15:24:44,737 - INFO - [Train] [54/90] | Loss: 0.2833 | Train Acc: 95.17%
+2026-03-09 15:25:23,274 - INFO - [Valid] [54/90] | Loss: 0.3728 | Val Acc: 90.32%
+2026-03-09 15:25:23,410 - INFO - [Metrics for 'Normal'] | Precision: 0.9167 | Recall: 0.8983 | F1: 0.9074
+2026-03-09 15:25:23,410 - INFO - [Metrics for 'Defect'] | Precision: 0.8887 | Recall: 0.9086 | F1: 0.8985
+2026-03-09 15:25:23,457 - INFO - --------------------------------------------------
+2026-03-09 15:25:23,457 - INFO - [LR]    [55/90] | Learning Rate: 0.000480
+2026-03-09 15:32:43,872 - INFO - [Train] [55/90] | Loss: 0.2747 | Train Acc: 95.72%
+2026-03-09 15:33:22,555 - INFO - [Valid] [55/90] | Loss: 0.3750 | Val Acc: 90.29%
+2026-03-09 15:33:22,735 - INFO - [Metrics for 'Normal'] | Precision: 0.9171 | Recall: 0.8973 | F1: 0.9071
+2026-03-09 15:33:22,736 - INFO - [Metrics for 'Defect'] | Precision: 0.8878 | Recall: 0.9092 | F1: 0.8983
+2026-03-09 15:33:22,794 - INFO - --------------------------------------------------
+2026-03-09 15:33:22,795 - INFO - [LR]    [56/90] | Learning Rate: 0.000462
+2026-03-09 15:40:43,343 - INFO - [Train] [56/90] | Loss: 0.2747 | Train Acc: 95.72%
+2026-03-09 15:41:22,058 - INFO - [Valid] [56/90] | Loss: 0.3707 | Val Acc: 90.27%
+2026-03-09 15:41:22,239 - INFO - [Metrics for 'Normal'] | Precision: 0.9136 | Recall: 0.9010 | F1: 0.9072
+2026-03-09 15:41:22,239 - INFO - [Metrics for 'Defect'] | Precision: 0.8909 | Recall: 0.9046 | F1: 0.8977
+2026-03-09 15:41:22,289 - INFO - --------------------------------------------------
+2026-03-09 15:41:22,290 - INFO - [LR]    [57/90] | Learning Rate: 0.000445
+2026-03-09 15:48:43,292 - INFO - [Train] [57/90] | Loss: 0.2737 | Train Acc: 95.77%
+2026-03-09 15:49:22,150 - INFO - [Valid] [57/90] | Loss: 0.3768 | Val Acc: 90.05%
+2026-03-09 15:49:22,287 - INFO - [Metrics for 'Normal'] | Precision: 0.9124 | Recall: 0.8978 | F1: 0.9051
+2026-03-09 15:49:22,287 - INFO - [Metrics for 'Defect'] | Precision: 0.8877 | Recall: 0.9036 | F1: 0.8956
+2026-03-09 15:49:22,334 - INFO - --------------------------------------------------
+2026-03-09 15:49:22,334 - INFO - [LR]    [58/90] | Learning Rate: 0.000428
+2026-03-09 15:56:43,174 - INFO - [Train] [58/90] | Loss: 0.2719 | Train Acc: 95.89%
+2026-03-09 15:57:22,176 - INFO - [Valid] [58/90] | Loss: 0.3836 | Val Acc: 90.17%
+2026-03-09 15:57:22,335 - INFO - [Metrics for 'Normal'] | Precision: 0.9116 | Recall: 0.9014 | F1: 0.9064
+2026-03-09 15:57:22,335 - INFO - [Metrics for 'Defect'] | Precision: 0.8910 | Recall: 0.9021 | F1: 0.8965
+2026-03-09 15:57:22,382 - INFO - --------------------------------------------------
+2026-03-09 15:57:22,382 - INFO - [LR]    [59/90] | Learning Rate: 0.000411
+2026-03-09 16:04:43,709 - INFO - [Train] [59/90] | Loss: 0.2735 | Train Acc: 95.82%
+2026-03-09 16:05:22,167 - INFO - [Valid] [59/90] | Loss: 0.3759 | Val Acc: 90.05%
+2026-03-09 16:05:22,305 - INFO - [Metrics for 'Normal'] | Precision: 0.9139 | Recall: 0.8961 | F1: 0.9049
+2026-03-09 16:05:22,305 - INFO - [Metrics for 'Defect'] | Precision: 0.8862 | Recall: 0.9055 | F1: 0.8957
+2026-03-09 16:05:22,351 - INFO - --------------------------------------------------
+2026-03-09 16:05:22,352 - INFO - [LR]    [60/90] | Learning Rate: 0.000394
+2026-03-09 16:12:43,896 - INFO - [Train] [60/90] | Loss: 0.2685 | Train Acc: 96.16%
+2026-03-09 16:13:22,596 - INFO - [Valid] [60/90] | Loss: 0.3815 | Val Acc: 90.04%
+2026-03-09 16:13:22,742 - INFO - [Metrics for 'Normal'] | Precision: 0.9041 | Recall: 0.9077 | F1: 0.9059
+2026-03-09 16:13:22,743 - INFO - [Metrics for 'Defect'] | Precision: 0.8962 | Recall: 0.8923 | F1: 0.8942
+2026-03-09 16:13:22,789 - INFO - --------------------------------------------------
+2026-03-09 16:13:22,789 - INFO - [LR]    [61/90] | Learning Rate: 0.000378
+2026-03-09 16:20:44,201 - INFO - [Train] [61/90] | Loss: 0.2659 | Train Acc: 96.31%
+2026-03-09 16:21:22,680 - INFO - [Valid] [61/90] | Loss: 0.3787 | Val Acc: 90.12%
+2026-03-09 16:21:22,825 - INFO - [Metrics for 'Normal'] | Precision: 0.9166 | Recall: 0.8943 | F1: 0.9053
+2026-03-09 16:21:22,826 - INFO - [Metrics for 'Defect'] | Precision: 0.8849 | Recall: 0.9089 | F1: 0.8967
+2026-03-09 16:21:22,872 - INFO - --------------------------------------------------
+2026-03-09 16:21:22,872 - INFO - [LR]    [62/90] | Learning Rate: 0.000362
+2026-03-09 16:28:43,063 - INFO - [Train] [62/90] | Loss: 0.2654 | Train Acc: 96.32%
+2026-03-09 16:29:21,468 - INFO - [Valid] [62/90] | Loss: 0.3803 | Val Acc: 90.05%
+2026-03-09 16:29:21,614 - INFO - [Metrics for 'Normal'] | Precision: 0.9113 | Recall: 0.8992 | F1: 0.9052
+2026-03-09 16:29:21,614 - INFO - [Metrics for 'Defect'] | Precision: 0.8888 | Recall: 0.9020 | F1: 0.8954
+2026-03-09 16:29:21,667 - INFO - --------------------------------------------------
+2026-03-09 16:29:21,668 - INFO - [LR]    [63/90] | Learning Rate: 0.000346
+2026-03-09 16:36:43,542 - INFO - [Train] [63/90] | Loss: 0.2642 | Train Acc: 96.39%
+2026-03-09 16:37:22,624 - INFO - [Valid] [63/90] | Loss: 0.3850 | Val Acc: 89.82%
+2026-03-09 16:37:22,760 - INFO - [Metrics for 'Normal'] | Precision: 0.9161 | Recall: 0.8886 | F1: 0.9021
+2026-03-09 16:37:22,760 - INFO - [Metrics for 'Defect'] | Precision: 0.8793 | Recall: 0.9090 | F1: 0.8939
+2026-03-09 16:37:22,806 - INFO - --------------------------------------------------
+2026-03-09 16:37:22,806 - INFO - [LR]    [64/90] | Learning Rate: 0.000330
+2026-03-09 16:44:44,138 - INFO - [Train] [64/90] | Loss: 0.2621 | Train Acc: 96.53%
+2026-03-09 16:45:22,503 - INFO - [Valid] [64/90] | Loss: 0.3862 | Val Acc: 89.95%
+2026-03-09 16:45:22,678 - INFO - [Metrics for 'Normal'] | Precision: 0.9153 | Recall: 0.8922 | F1: 0.9036
+2026-03-09 16:45:22,678 - INFO - [Metrics for 'Defect'] | Precision: 0.8826 | Recall: 0.9076 | F1: 0.8950
+2026-03-09 16:45:22,733 - INFO - --------------------------------------------------
+2026-03-09 16:45:22,734 - INFO - [LR]    [65/90] | Learning Rate: 0.000315
+2026-03-09 16:52:43,018 - INFO - [Train] [65/90] | Loss: 0.2601 | Train Acc: 96.65%
+2026-03-09 16:53:21,407 - INFO - [Valid] [65/90] | Loss: 0.3868 | Val Acc: 89.96%
+2026-03-09 16:53:21,553 - INFO - [Metrics for 'Normal'] | Precision: 0.9114 | Recall: 0.8971 | F1: 0.9042
+2026-03-09 16:53:21,553 - INFO - [Metrics for 'Defect'] | Precision: 0.8869 | Recall: 0.9024 | F1: 0.8946
+2026-03-09 16:53:21,600 - INFO - --------------------------------------------------
+2026-03-09 16:53:21,600 - INFO - [LR]    [66/90] | Learning Rate: 0.000300
+2026-03-09 17:00:42,066 - INFO - [Train] [66/90] | Loss: 0.2583 | Train Acc: 96.76%
+2026-03-09 17:01:20,456 - INFO - [Valid] [66/90] | Loss: 0.3857 | Val Acc: 90.06%
+2026-03-09 17:01:20,603 - INFO - [Metrics for 'Normal'] | Precision: 0.9166 | Recall: 0.8930 | F1: 0.9046
+2026-03-09 17:01:20,603 - INFO - [Metrics for 'Defect'] | Precision: 0.8836 | Recall: 0.9091 | F1: 0.8962
+2026-03-09 17:01:20,649 - INFO - --------------------------------------------------
+2026-03-09 17:01:20,650 - INFO - [LR]    [67/90] | Learning Rate: 0.000285
+2026-03-09 17:08:41,177 - INFO - [Train] [67/90] | Loss: 0.2570 | Train Acc: 96.84%
+2026-03-09 17:09:19,581 - INFO - [Valid] [67/90] | Loss: 0.3890 | Val Acc: 89.87%
+2026-03-09 17:09:19,727 - INFO - [Metrics for 'Normal'] | Precision: 0.9092 | Recall: 0.8978 | F1: 0.9035
+2026-03-09 17:09:19,727 - INFO - [Metrics for 'Defect'] | Precision: 0.8872 | Recall: 0.8997 | F1: 0.8934
+2026-03-09 17:09:19,774 - INFO - --------------------------------------------------
+2026-03-09 17:09:19,774 - INFO - [LR]    [68/90] | Learning Rate: 0.000271
+2026-03-09 17:16:41,024 - INFO - [Train] [68/90] | Loss: 0.2554 | Train Acc: 96.94%
+2026-03-09 17:17:19,735 - INFO - [Valid] [68/90] | Loss: 0.3905 | Val Acc: 90.02%
+2026-03-09 17:17:19,880 - INFO - [Metrics for 'Normal'] | Precision: 0.9176 | Recall: 0.8910 | F1: 0.9041
+2026-03-09 17:17:19,880 - INFO - [Metrics for 'Defect'] | Precision: 0.8819 | Recall: 0.9105 | F1: 0.8960
+2026-03-09 17:17:19,926 - INFO - --------------------------------------------------
+2026-03-09 17:17:19,927 - INFO - [LR]    [69/90] | Learning Rate: 0.000258
+2026-03-09 17:24:39,774 - INFO - [Train] [69/90] | Loss: 0.2537 | Train Acc: 97.04%
+2026-03-09 17:25:18,048 - INFO - [Valid] [69/90] | Loss: 0.3968 | Val Acc: 89.77%
+2026-03-09 17:25:18,185 - INFO - [Metrics for 'Normal'] | Precision: 0.9154 | Recall: 0.8883 | F1: 0.9017
+2026-03-09 17:25:18,186 - INFO - [Metrics for 'Defect'] | Precision: 0.8790 | Recall: 0.9082 | F1: 0.8934
+2026-03-09 17:25:18,232 - INFO - --------------------------------------------------
+2026-03-09 17:25:18,232 - INFO - [LR]    [70/90] | Learning Rate: 0.000245
+2026-03-09 17:32:39,532 - INFO - [Train] [70/90] | Loss: 0.2519 | Train Acc: 97.16%
+2026-03-09 17:33:17,929 - INFO - [Valid] [70/90] | Loss: 0.3931 | Val Acc: 89.94%
+2026-03-09 17:33:18,084 - INFO - [Metrics for 'Normal'] | Precision: 0.9116 | Recall: 0.8964 | F1: 0.9039
+2026-03-09 17:33:18,084 - INFO - [Metrics for 'Defect'] | Precision: 0.8861 | Recall: 0.9027 | F1: 0.8943
+2026-03-09 17:33:18,130 - INFO - --------------------------------------------------
+2026-03-09 17:33:18,131 - INFO - [LR]    [71/90] | Learning Rate: 0.000232
+2026-03-09 17:40:40,254 - INFO - [Train] [71/90] | Loss: 0.2518 | Train Acc: 97.17%
+2026-03-09 17:41:18,740 - INFO - [Valid] [71/90] | Loss: 0.3931 | Val Acc: 90.03%
+2026-03-09 17:41:18,888 - INFO - [Metrics for 'Normal'] | Precision: 0.9105 | Recall: 0.8996 | F1: 0.9050
+2026-03-09 17:41:18,888 - INFO - [Metrics for 'Defect'] | Precision: 0.8891 | Recall: 0.9010 | F1: 0.8950
+2026-03-09 17:41:18,934 - INFO - --------------------------------------------------
+2026-03-09 17:41:18,935 - INFO - [LR]    [72/90] | Learning Rate: 0.000220
+2026-03-09 17:48:40,493 - INFO - [Train] [72/90] | Loss: 0.2492 | Train Acc: 97.33%
+2026-03-09 17:49:18,977 - INFO - [Valid] [72/90] | Loss: 0.3986 | Val Acc: 89.89%
+2026-03-09 17:49:19,160 - INFO - [Metrics for 'Normal'] | Precision: 0.9153 | Recall: 0.8909 | F1: 0.9030
+2026-03-09 17:49:19,160 - INFO - [Metrics for 'Defect'] | Precision: 0.8815 | Recall: 0.9078 | F1: 0.8944
+2026-03-09 17:49:19,220 - INFO - --------------------------------------------------
+2026-03-09 17:49:19,221 - INFO - [LR]    [73/90] | Learning Rate: 0.000208
+2026-03-09 17:56:39,168 - INFO - [Train] [73/90] | Loss: 0.2483 | Train Acc: 97.37%
+2026-03-09 17:57:17,909 - INFO - [Valid] [73/90] | Loss: 0.4003 | Val Acc: 89.73%
+2026-03-09 17:57:18,046 - INFO - [Metrics for 'Normal'] | Precision: 0.9115 | Recall: 0.8923 | F1: 0.9018
+2026-03-09 17:57:18,046 - INFO - [Metrics for 'Defect'] | Precision: 0.8822 | Recall: 0.9030 | F1: 0.8925
+2026-03-09 17:57:18,092 - INFO - --------------------------------------------------
+2026-03-09 17:57:18,092 - INFO - [LR]    [74/90] | Learning Rate: 0.000197
+2026-03-09 18:04:39,501 - INFO - [Train] [74/90] | Loss: 0.2469 | Train Acc: 97.48%
+2026-03-09 18:05:18,288 - INFO - [Valid] [74/90] | Loss: 0.4016 | Val Acc: 89.78%
+2026-03-09 18:05:18,425 - INFO - [Metrics for 'Normal'] | Precision: 0.9126 | Recall: 0.8919 | F1: 0.9022
+2026-03-09 18:05:18,425 - INFO - [Metrics for 'Defect'] | Precision: 0.8820 | Recall: 0.9044 | F1: 0.8931
+2026-03-09 18:05:18,472 - INFO - --------------------------------------------------
+2026-03-09 18:05:18,472 - INFO - [LR]    [75/90] | Learning Rate: 0.000186
+2026-03-09 18:12:39,524 - INFO - [Train] [75/90] | Loss: 0.2461 | Train Acc: 97.52%
+2026-03-09 18:13:18,067 - INFO - [Valid] [75/90] | Loss: 0.4008 | Val Acc: 89.77%
+2026-03-09 18:13:18,214 - INFO - [Metrics for 'Normal'] | Precision: 0.9111 | Recall: 0.8936 | F1: 0.9022
+2026-03-09 18:13:18,214 - INFO - [Metrics for 'Defect'] | Precision: 0.8834 | Recall: 0.9024 | F1: 0.8928
+2026-03-09 18:13:18,261 - INFO - --------------------------------------------------
+2026-03-09 18:13:18,261 - INFO - [LR]    [76/90] | Learning Rate: 0.000176
+2026-03-09 18:20:40,677 - INFO - [Train] [76/90] | Loss: 0.2447 | Train Acc: 97.61%
+2026-03-09 18:21:19,400 - INFO - [Valid] [76/90] | Loss: 0.4032 | Val Acc: 89.73%
+2026-03-09 18:21:19,548 - INFO - [Metrics for 'Normal'] | Precision: 0.9086 | Recall: 0.8956 | F1: 0.9021
+2026-03-09 18:21:19,548 - INFO - [Metrics for 'Defect'] | Precision: 0.8850 | Recall: 0.8992 | F1: 0.8920
+2026-03-09 18:21:19,594 - INFO - --------------------------------------------------
+2026-03-09 18:21:19,595 - INFO - [LR]    [77/90] | Learning Rate: 0.000166
+2026-03-09 18:28:40,997 - INFO - [Train] [77/90] | Loss: 0.2435 | Train Acc: 97.67%
+2026-03-09 18:29:19,410 - INFO - [Valid] [77/90] | Loss: 0.4049 | Val Acc: 89.79%
+2026-03-09 18:29:19,558 - INFO - [Metrics for 'Normal'] | Precision: 0.9130 | Recall: 0.8916 | F1: 0.9022
+2026-03-09 18:29:19,558 - INFO - [Metrics for 'Defect'] | Precision: 0.8818 | Recall: 0.9049 | F1: 0.8932
+2026-03-09 18:29:19,612 - INFO - --------------------------------------------------
+2026-03-09 18:29:19,612 - INFO - [LR]    [78/90] | Learning Rate: 0.000157
+2026-03-09 18:36:41,736 - INFO - [Train] [78/90] | Loss: 0.2426 | Train Acc: 97.74%
+2026-03-09 18:37:20,635 - INFO - [Valid] [78/90] | Loss: 0.4075 | Val Acc: 89.80%
+2026-03-09 18:37:20,782 - INFO - [Metrics for 'Normal'] | Precision: 0.9136 | Recall: 0.8910 | F1: 0.9022
+2026-03-09 18:37:20,782 - INFO - [Metrics for 'Defect'] | Precision: 0.8813 | Recall: 0.9057 | F1: 0.8933
+2026-03-09 18:37:20,829 - INFO - --------------------------------------------------
+2026-03-09 18:37:20,829 - INFO - [LR]    [79/90] | Learning Rate: 0.000149
+2026-03-09 18:44:42,707 - INFO - [Train] [79/90] | Loss: 0.2414 | Train Acc: 97.82%
+2026-03-09 18:45:21,428 - INFO - [Valid] [79/90] | Loss: 0.4065 | Val Acc: 89.82%
+2026-03-09 18:45:21,574 - INFO - [Metrics for 'Normal'] | Precision: 0.9089 | Recall: 0.8972 | F1: 0.9030
+2026-03-09 18:45:21,574 - INFO - [Metrics for 'Defect'] | Precision: 0.8866 | Recall: 0.8993 | F1: 0.8929
+2026-03-09 18:45:21,620 - INFO - --------------------------------------------------
+2026-03-09 18:45:21,621 - INFO - [LR]    [80/90] | Learning Rate: 0.000141
+2026-03-09 18:52:43,962 - INFO - [Train] [80/90] | Loss: 0.2403 | Train Acc: 97.87%
+2026-03-09 18:53:22,771 - INFO - [Valid] [80/90] | Loss: 0.4076 | Val Acc: 89.72%
+2026-03-09 18:53:22,918 - INFO - [Metrics for 'Normal'] | Precision: 0.9064 | Recall: 0.8981 | F1: 0.9022
+2026-03-09 18:53:22,918 - INFO - [Metrics for 'Defect'] | Precision: 0.8871 | Recall: 0.8962 | F1: 0.8916
+2026-03-09 18:53:22,964 - INFO - --------------------------------------------------
+2026-03-09 18:53:22,965 - INFO - [LR]    [81/90] | Learning Rate: 0.000134
+2026-03-09 19:00:45,108 - INFO - [Train] [81/90] | Loss: 0.2395 | Train Acc: 97.92%
+2026-03-09 19:01:23,420 - INFO - [Valid] [81/90] | Loss: 0.4097 | Val Acc: 89.72%
+2026-03-09 19:01:23,567 - INFO - [Metrics for 'Normal'] | Precision: 0.9098 | Recall: 0.8939 | F1: 0.9018
+2026-03-09 19:01:23,567 - INFO - [Metrics for 'Defect'] | Precision: 0.8835 | Recall: 0.9009 | F1: 0.8921
+2026-03-09 19:01:23,613 - INFO - --------------------------------------------------
+2026-03-09 19:01:23,614 - INFO - [LR]    [82/90] | Learning Rate: 0.000128
+2026-03-09 19:08:44,399 - INFO - [Train] [82/90] | Loss: 0.2391 | Train Acc: 97.95%
+2026-03-09 19:09:23,281 - INFO - [Valid] [82/90] | Loss: 0.4106 | Val Acc: 89.73%
+2026-03-09 19:09:23,418 - INFO - [Metrics for 'Normal'] | Precision: 0.9118 | Recall: 0.8919 | F1: 0.9017
+2026-03-09 19:09:23,419 - INFO - [Metrics for 'Defect'] | Precision: 0.8819 | Recall: 0.9034 | F1: 0.8925
+2026-03-09 19:09:23,465 - INFO - --------------------------------------------------
+2026-03-09 19:09:23,466 - INFO - [LR]    [83/90] | Learning Rate: 0.000122
+2026-03-09 19:16:44,257 - INFO - [Train] [83/90] | Loss: 0.2383 | Train Acc: 98.01%
+2026-03-09 19:17:22,706 - INFO - [Valid] [83/90] | Loss: 0.4125 | Val Acc: 89.68%
+2026-03-09 19:17:22,853 - INFO - [Metrics for 'Normal'] | Precision: 0.9079 | Recall: 0.8954 | F1: 0.9016
+2026-03-09 19:17:22,853 - INFO - [Metrics for 'Defect'] | Precision: 0.8847 | Recall: 0.8983 | F1: 0.8914
+2026-03-09 19:17:22,899 - INFO - --------------------------------------------------
+2026-03-09 19:17:22,899 - INFO - [LR]    [84/90] | Learning Rate: 0.000117
+2026-03-09 19:24:43,438 - INFO - [Train] [84/90] | Loss: 0.2373 | Train Acc: 98.06%
+2026-03-09 19:25:22,021 - INFO - [Valid] [84/90] | Loss: 0.4119 | Val Acc: 89.75%
+2026-03-09 19:25:22,169 - INFO - [Metrics for 'Normal'] | Precision: 0.9094 | Recall: 0.8951 | F1: 0.9022
+2026-03-09 19:25:22,169 - INFO - [Metrics for 'Defect'] | Precision: 0.8846 | Recall: 0.9002 | F1: 0.8923
+2026-03-09 19:25:22,215 - INFO - --------------------------------------------------
+2026-03-09 19:25:22,216 - INFO - [LR]    [85/90] | Learning Rate: 0.000112
+2026-03-09 19:32:42,255 - INFO - [Train] [85/90] | Loss: 0.2368 | Train Acc: 98.09%
+2026-03-09 19:33:20,870 - INFO - [Valid] [85/90] | Loss: 0.4162 | Val Acc: 89.61%
+2026-03-09 19:33:21,017 - INFO - [Metrics for 'Normal'] | Precision: 0.9118 | Recall: 0.8894 | F1: 0.9005
+2026-03-09 19:33:21,017 - INFO - [Metrics for 'Defect'] | Precision: 0.8796 | Recall: 0.9037 | F1: 0.8914
+2026-03-09 19:33:21,064 - INFO - --------------------------------------------------
+2026-03-09 19:33:21,064 - INFO - [LR]    [86/90] | Learning Rate: 0.000109
+2026-03-09 19:40:40,553 - INFO - [Train] [86/90] | Loss: 0.2363 | Train Acc: 98.12%
+2026-03-09 19:41:18,867 - INFO - [Valid] [86/90] | Loss: 0.4136 | Val Acc: 89.68%
+2026-03-09 19:41:19,047 - INFO - [Metrics for 'Normal'] | Precision: 0.9130 | Recall: 0.8895 | F1: 0.9011
+2026-03-09 19:41:19,047 - INFO - [Metrics for 'Defect'] | Precision: 0.8797 | Recall: 0.9051 | F1: 0.8922
+2026-03-09 19:41:19,108 - INFO - --------------------------------------------------
+2026-03-09 19:41:19,109 - INFO - [LR]    [87/90] | Learning Rate: 0.000106
+2026-03-09 19:48:39,868 - INFO - [Train] [87/90] | Loss: 0.2358 | Train Acc: 98.15%
+2026-03-09 19:49:18,295 - INFO - [Valid] [87/90] | Loss: 0.4143 | Val Acc: 89.72%
+2026-03-09 19:49:18,467 - INFO - [Metrics for 'Normal'] | Precision: 0.9086 | Recall: 0.8953 | F1: 0.9019
+2026-03-09 19:49:18,467 - INFO - [Metrics for 'Defect'] | Precision: 0.8847 | Recall: 0.8992 | F1: 0.8919
+2026-03-09 19:49:18,527 - INFO - --------------------------------------------------
+2026-03-09 19:49:18,528 - INFO - [LR]    [88/90] | Learning Rate: 0.000103
+2026-03-09 19:56:38,125 - INFO - [Train] [88/90] | Loss: 0.2353 | Train Acc: 98.18%
+2026-03-09 19:57:16,884 - INFO - [Valid] [88/90] | Loss: 0.4172 | Val Acc: 89.59%
+2026-03-09 19:57:17,031 - INFO - [Metrics for 'Normal'] | Precision: 0.9133 | Recall: 0.8871 | F1: 0.9000
+2026-03-09 19:57:17,031 - INFO - [Metrics for 'Defect'] | Precision: 0.8776 | Recall: 0.9057 | F1: 0.8914
+2026-03-09 19:57:17,077 - INFO - --------------------------------------------------
+2026-03-09 19:57:17,078 - INFO - [LR]    [89/90] | Learning Rate: 0.000101
+2026-03-09 20:04:37,352 - INFO - [Train] [89/90] | Loss: 0.2350 | Train Acc: 98.20%
+2026-03-09 20:05:15,771 - INFO - [Valid] [89/90] | Loss: 0.4170 | Val Acc: 89.63%
+2026-03-09 20:05:15,954 - INFO - [Metrics for 'Normal'] | Precision: 0.9104 | Recall: 0.8915 | F1: 0.9008
+2026-03-09 20:05:15,955 - INFO - [Metrics for 'Defect'] | Precision: 0.8813 | Recall: 0.9018 | F1: 0.8914
+2026-03-09 20:05:16,014 - INFO - --------------------------------------------------
+2026-03-09 20:05:16,015 - INFO - [LR]    [90/90] | Learning Rate: 0.000100
+2026-03-09 20:12:36,651 - INFO - [Train] [90/90] | Loss: 0.2343 | Train Acc: 98.23%
+2026-03-09 20:13:14,760 - INFO - [Valid] [90/90] | Loss: 0.4180 | Val Acc: 89.64%
+2026-03-09 20:13:14,916 - INFO - [Metrics for 'Normal'] | Precision: 0.9118 | Recall: 0.8900 | F1: 0.9008
+2026-03-09 20:13:14,917 - INFO - [Metrics for 'Defect'] | Precision: 0.8801 | Recall: 0.9037 | F1: 0.8917
+2026-03-09 20:13:14,966 - INFO - ==================================================
+2026-03-09 20:13:14,966 - INFO - 훈련 완료. 최고 성능 모델을 불러와 테스트 세트로 최종 평가합니다.
+2026-03-09 20:13:14,966 - INFO - 최종 평가를 위해 새로운 모델 객체를 생성합니다.
+2026-03-09 20:13:14,966 - INFO - Baseline 모델 'mobilenet_v4_s'을(를) 생성합니다 (사전 훈련 가중치: 미사용).
+2026-03-09 20:13:14,989 - INFO - 최종 평가 모델에 Pruning 구조를 재적용합니다.
+2026-03-09 20:13:15,129 - INFO - Wanda Pruning을 시작합니다.
+2026-03-09 20:13:15,130 - INFO - 저장된 pruning_history가 있어 Wanda calibration을 건너뜁니다.
+2026-03-09 20:13:15,130 - INFO - 분류 레이어 'Linear'을(를) Pruning 대상에서 제외합니다.
+2026-03-09 20:13:15,149 - INFO - 저장된 pruning_history를 사용해 Pruning 구조를 재현했습니다.
+2026-03-09 20:13:15,149 - INFO - torch-pruning 완료. 모델 구조가 희소도(0.2451)에 맞춰 변경되었습니다.
+2026-03-09 20:13:15,149 - INFO - ==================================================
+2026-03-09 20:13:15,169 - INFO - 최고 성능 모델 가중치를 새로 생성된 모델 객체에 로드 완료: 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/best_model.pth'
+2026-03-09 20:13:15,169 - INFO - ==================================================
+2026-03-09 20:13:15,169 - INFO - Test 모드를 시작합니다.
+2026-03-09 20:13:15,169 - INFO - FLOPs 및 MACs 측정을 시작합니다...
+2026-03-09 20:13:15,189 - INFO - Model FLOPs: 0.2266 GFLOPs
+2026-03-09 20:13:15,189 - INFO - Model MACs: 0.1133 GMACs
+2026-03-09 20:13:15,299 - INFO - 테스트 데이터셋에 대한 추론을 시작합니다.
+2026-03-09 20:13:55,326 - INFO - [Test] Loss: 0.2506 | Test Acc: 90.69%
+2026-03-09 20:13:55,462 - INFO - [Metrics for 'Normal'] | Precision: 0.9238 | Recall: 0.8977 | F1: 0.9106
+2026-03-09 20:13:55,462 - INFO - [Metrics for 'Defect'] | Precision: 0.8890 | Recall: 0.9172 | F1: 0.9029
+2026-03-09 20:13:55,669 - INFO - ==================================================
+2026-03-09 20:13:55,669 - INFO - 혼동 행렬 저장 완료. 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/confusion_matrix_20260309_081355.png' and 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/confusion_matrix_20260309_081355.pdf'
+2026-03-09 20:13:55,763 - INFO - Val Acc 그래프 저장 완료: 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/val_acc.png' and 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/val_acc.pdf'
+2026-03-09 20:13:55,868 - INFO - Train/Val Acc 그래프 저장 완료: 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/train_val_acc.png' and 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/train_val_acc.pdf'
+2026-03-09 20:13:55,953 - INFO - F1 (Normal) 그래프 저장 완료: 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/F1_normal.png' and 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/F1_normal.pdf'
+2026-03-09 20:13:56,043 - INFO - Validation Loss 그래프 저장 완료: 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/val_loss.png' and 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/val_loss.pdf'
+2026-03-09 20:13:56,132 - INFO - Learning Rate 그래프 저장 완료: 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/learning_rate.png' and 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/learning_rate.pdf'
+2026-03-09 20:13:59,547 - INFO - 종합 그래프 저장 완료: 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/compile.png' and 'log/Sewer_ML_flops/baseline_mobilenet_v4_s_wanda_20260309_081355/graph_20260309_081355/compile.pdf'
