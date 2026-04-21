@@ -20,9 +20,6 @@ first_point_artist = None
 ax = None
 fig = None
 
-BLUR_SIGMA = 20.0
-
-
 def make_mask_box(top_left, bottom_right):
     x1, y1 = top_left
     x2, y2 = bottom_right
@@ -181,7 +178,7 @@ def main():
         default=80,
         help="하위 호환용 옵션(현재는 사용하지 않음)",
     )
-    parser.add_argument("--blur-sigma", type=float, default=8.0, help="가우시안 블러 강도(기본값: 8.0)")
+    parser.add_argument("--blur-sigma", type=float, default=20.0, help="가우시안 블러 강도(기본값: 8.0)")
     args = parser.parse_args()
 
     if args.blur_sigma <= 0:
